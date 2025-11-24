@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disease Predictor</title>
+        <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #e0f7fa, #f1f8ff);
+        padding: 40px;
+    }
+
+    .box {
+        background: #ffffff;
+        padding: 30px 35px;
+        border-radius: 18px;
+        width: 50%;
+        margin: auto;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        border-top: 8px solid #0d6efd;
+        position: relative;
+    }
+
+    .box::before {
+        content: "🩺";
+        font-size: 40px;
+        position: absolute;
+        top: -22px;
+        left: -22px;
+        background: #ffffff;
+        border-radius: 50%;
+        padding: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #0d6efd;
+        margin-bottom: 25px;
+        letter-spacing: 0.5px;
+    }
+
+    label {
+        font-weight: 600;
+        color: #333;
+        font-size: 15px;
+    }
+
+    input {
+        width: 100%;
+        padding: 14px;
+        margin-top: 10px;
+        border-radius: 10px;
+        border: 1px solid #d0e2ff;
+        font-size: 15px;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 18px;
+        background: linear-gradient(135deg, #0d6efd, #00bcd4);
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.3px;
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.25);
+    }
+
+    h2 {
+        color: #198754;
+        margin-top: 25px;
+        text-align: center;
+    }
+
+    h3 {
+        margin-top: 20px;
+        color: #0d6efd;
+        border-bottom: 2px solid #e3f2fd;
+        padding-bottom: 5px;
+    }
+
+    p {
+        color: #444;
+        line-height: 1.6;
+        background: #f8fbff;
+        padding: 12px;
+        border-radius: 10px;
+        border-left: 4px solid #0d6efd;
+        margin-top: 10px;
+    }
+
+    ul {
+        background: #f8fbff;
+        padding: 15px 25px;
+        border-radius: 12px;
+        margin-top: 10px;
+    }
+
+    li {
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+    }
+</style>
+</head>
+<body>
+    <div class="box">
+        <h1>Disease Prediction System</h1>
+
+        <form method="POST" action="/predict">
+            <label>Enter symptoms (comma-separated):</label>
+            <input type="text" name="symptoms" placeholder="fever, cough, headache" required>
+            <button type="submit">Predict</button>
+        </form>
+
+        {% if prediction %}
+            <h2>Predicted Disease: {{ prediction }}</h2>
+            <p><b>Description:</b> {{ description }}</p>
+            <h3>Precautions:</h3>
+            <ul>
+                {% for p in precautions %}
+                    <li>{{ p }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</body>
+</html>
