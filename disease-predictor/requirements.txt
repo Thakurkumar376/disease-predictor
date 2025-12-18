@@ -1,3 +1,6 @@
+gunicorn
+flask
+flask-cors
 scikit-learn
 pandas
 pyttsx3
