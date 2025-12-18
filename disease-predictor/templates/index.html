@@ -1,143 +1,351 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Disease Predictor</title>
-        <style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #e0f7fa, #f1f8ff);
-        padding: 40px;
-    }
+    <meta charset="UTF-8">
+    <title>AI Symptom Checker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
 
-    .box {
-        background: #ffffff;
-        padding: 30px 35px;
-        border-radius: 18px;
-        width: 50%;
-        margin: auto;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-        border-top: 8px solid #0d6efd;
-        position: relative;
-    }
+        body {
+            background: linear-gradient(135deg, #0b1020 0%, #1e1b4b 100%);
+            color: #f7f7ff;
+            min-height: 100vh;
+            padding: 16px;
+        }
 
-    .box::before {
-        content: "🩺";
-        font-size: 40px;
-        position: absolute;
-        top: -22px;
-        left: -22px;
-        background: #ffffff;
-        border-radius: 50%;
-        padding: 10px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    }
+        .app-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: rgba(20, 24, 41, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(88, 101, 242, 0.3);
+            overflow: hidden;
+        }
 
-    h1 {
-        text-align: center;
-        color: #0d6efd;
-        margin-bottom: 25px;
-        letter-spacing: 0.5px;
-    }
+        .header {
+            padding: 24px 28px 16px;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1));
+            border-bottom: 1px solid rgba(88, 101, 242, 0.2);
+        }
 
-    label {
-        font-weight: 600;
-        color: #333;
-        font-size: 15px;
-    }
+        .header-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
 
-    input {
-        width: 100%;
-        padding: 14px;
-        margin-top: 10px;
-        border-radius: 10px;
-        border: 1px solid #d0e2ff;
-        font-size: 15px;
-        outline: none;
-        transition: all 0.2s ease;
-    }
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    input:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
-    }
+        .badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            font-weight: 600;
+        }
 
-    button {
-        width: 100%;
-        padding: 14px;
-        margin-top: 18px;
-        background: linear-gradient(135deg, #0d6efd, #00bcd4);
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        letter-spacing: 0.3px;
-    }
+        .chat-window {
+            height: 420px;
+            background: rgba(11, 16, 32, 0.8);
+            border: 1px solid rgba(88, 101, 242, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            overflow-y: auto;
+            margin: 0 28px 20px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
 
-    button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.25);
-    }
+        .msg {
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
 
-    h2 {
-        color: #198754;
-        margin-top: 25px;
-        text-align: center;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    h3 {
-        margin-top: 20px;
-        color: #0d6efd;
-        border-bottom: 2px solid #e3f2fd;
-        padding-bottom: 5px;
-    }
+        .msg.user {
+            text-align: right;
+        }
 
-    p {
-        color: #444;
-        line-height: 1.6;
-        background: #f8fbff;
-        padding: 12px;
-        border-radius: 10px;
-        border-left: 4px solid #0d6efd;
-        margin-top: 10px;
-    }
+        .msg.bot .content {
+            background: linear-gradient(135deg, #1e1b4b, #2d3748);
+            border-radius: 16px;
+            padding: 16px 20px;
+            border: 1px solid rgba(88, 101, 242, 0.3);
+        }
 
-    ul {
-        background: #f8fbff;
-        padding: 15px 25px;
-        border-radius: 12px;
-        margin-top: 10px;
-    }
+        .msg.user .content {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: white;
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: inline-block;
+            max-width: 80%;
+        }
 
-    li {
-        margin-bottom: 8px;
-        color: #333;
-        font-weight: 500;
-    }
-</style>
+        .copy-btn {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(16, 185, 129, 0.4);
+            transform: scale(1.05);
+        }
+
+        .quick-symptoms {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+
+        .quick-symptoms button {
+            background: transparent;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            color: #60a5fa;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-symptoms button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            padding: 0 28px 28px;
+            position: sticky;
+            bottom: 0;
+            background: rgba(20, 24, 41, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        #messageInput {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(88, 101, 242, 0.4);
+            border-radius: 25px;
+            padding: 14px 20px;
+            color: #f7f7ff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        #messageInput:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        #messageInput::placeholder {
+            color: #6b7280;
+        }
+
+        button {
+            border-radius: 25px;
+            border: none;
+            padding: 14px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .reset-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .footer {
+            padding: 16px 28px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6b7280;
+            border-top: 1px solid rgba(88, 101, 242, 0.1);
+        }
+
+        .confidence-high { color: #10b981; }
+        .confidence-low { color: #f59e0b; }
+        .emergency { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+    </style>
 </head>
 <body>
-    <div class="box">
-        <h1>Disease Prediction System</h1>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-title">AI Symptom Checker</div>
+            <div class="header-subtitle">
+                <span class="badge">42 Diseases • 131 Symptoms</span>
+                <button class="reset-btn" onclick="resetChat()">🔄 Reset</button>
+            </div>
+        </div>
 
-        <form method="POST" action="/predict">
-            <label>Enter symptoms (comma-separated):</label>
-            <input type="text" name="symptoms" placeholder="fever, cough, headache" required>
-            <button type="submit">Predict</button>
-        </form>
+        <div id="chatWindow" class="chat-window">
+            <div class="msg bot">
+                <div class="content">
+                    <strong>👋 Welcome!</strong> Describe your symptoms (e.g., "skin rash, itching")<br><br>
+                    <div class="quick-symptoms">
+                        <strong>Quick test:</strong>
+                        <button onclick="copyToClipboard('skin rash, itching')">Rash + Itch</button>
+                        <button onclick="copyToClipboard('continuous sneezing, chills')">Sneezing</button>
+                        <button onclick="copyToClipboard('vomiting, diarrhoea')">Vomiting</button>
+                        <button onclick="copyToClipboard('chills, high fever')">Fever</button>
+                    </div>
+                    <small style="color: #9ca3af;">⚠️ Not a medical diagnosis</small>
+                </div>
+            </div>
+        </div>
 
-        {% if prediction %}
-            <h2>Predicted Disease: {{ prediction }}</h2>
-            <p><b>Description:</b> {{ description }}</p>
-            <h3>Precautions:</h3>
-            <ul>
-                {% for p in precautions %}
-                    <li>{{ p }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        <div class="input-row">
+            <input id="messageInput" type="text" placeholder="Type symptoms or answer questions..." 
+                   onkeydown="if(event.key==='Enter') sendMessage();">
+            <button id="sendButton" onclick="sendMessage()">Send</button>
+        </div>
+
+        <div class="footer">
+            Educational demo • Built with RandomForest (100% validation accuracy)
+        </div>
     </div>
+
+    <script>
+        const chatWindow = document.getElementById("chatWindow");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+
+        function appendMessage(text, sender = 'bot') {
+            const div = document.createElement("div");
+            div.className = `msg ${sender}`;
+            div.innerHTML = sender === 'bot' ? `<div class="content">${text}</div>` : `<div class="content">${text}</div>`;
+            chatWindow.appendChild(div);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ Copied to clipboard!');
+                messageInput.value = text;
+                messageInput.focus();
+            }).catch(() => showToast('❌ Copy failed'));
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed; top: 20px; right: 20px; 
+                background: #10b981; color: white; padding: 12px 20px; 
+                border-radius: 12px; z-index: 9999; font-weight: 600;
+                box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, 'user');
+            messageInput.value = '';
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
+
+            try {
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ message: text })
+                });
+
+                const data = await response.json();
+                appendMessage(data.reply || "No response.");
+                
+                if (data.copied_text) {
+                    showToast(`✅ Copied: ${data.copied_text.substring(0, 30)}...`);
+                }
+            } catch (err) {
+                appendMessage("❌ Server error. Please try again.", 'bot');
+                console.error(err);
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send';
+                messageInput.focus();
+            }
+        }
+
+        async function resetChat() {
+            try {
+                await fetch("/api/reset", { method: "POST" });
+                chatWindow.innerHTML = `
+                    <div class="msg bot">
+                        <div class="content">
+                            <strong>🔄 Chat reset!</strong><br>
+                            <div class="quick-symptoms" style="margin-top: 12px;">
+                                <strong>Quick test:</strong>
+                                <button onclick="copyToClipboard('skin rash, itching')">Rash + Itch</button>
+                                <button onclick="copyToClipboard('continuous sneezing, chills')">Sneezing</button>
+                                <button onclick="copyToClipboard('vomiting, diarrhoea')">Vomiting</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
 </body>
 </html>
